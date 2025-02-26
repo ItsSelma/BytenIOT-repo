@@ -8,7 +8,7 @@ Byten je Arduino projekat namenjen praćenju lokacije osoba koje su sklone dezor
 - **Nadmorska visina**
 - **Geografska širina i dužina**
 - **Geofencing**
-- Slanje poruka u slučaju prekoračenja geofencinga, nadmorske visine..
+- **Slanje poruka u slučaju prekoračenja geofencinga, nadmorske visine..**
 
 ## 🔧 Tehnologije
 - Arduino
