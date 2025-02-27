@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen Background with Messages</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: black;
+            background-image: url('BYTEN.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .message {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 18px;
+            color: #00BFFF;
+            max-width: 30vw;
+            overflow-wrap: break-word;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            word-wrap: break-word;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        #textCanvas {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(184, 183, 153, 0.473);
+            color: #1C1C1C;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 200;
+        }
+    </style>
+</head>
+<body>
+    <div class="message" id="messageBox"></div>
+    <canvas id="textCanvas"></canvas>
+
+    <!-- Footer -->
+    <footer>
+        Profesor ~ dr. sc. Elmir Babović, Student ~ Selma Omerika
+    </footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWNrTwpHeRH_EMPZoVyq370vfd8H0GkSk",
+    authDomain: "byten-9bbb9.firebaseapp.com",
+    databaseURL: "https://byten-9bbb9-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "byten-9bbb9",
+    storageBucket: "byten-9bbb9.firebasestorage.app",
+    messagingSenderId: "937656836695",
+    appId: "1:937656836695:web:9b0c8610c4ee841f06f912"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const canvas = document.getElementById('textCanvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const img = new Image();
+  img.src = 'BYTEN.jpg';
+
+  function drawText(data) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    ctx.font = '40px Arial';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'left';
+
+    const text = `Vaša lokacija kuće:\n${data.homeLat}, ${data.homeLng}\nGeografska širina i visina:\n${data.currentLat}, ${data.currentLng}\nNadmorska visina:\n${data.altitude}m\nUdaljenost od kuće:\n${data.distance.toFixed(2)} m`;
+
+    const lines = text.split('\n');
+    const startX = 550;
+    const startY = 420;
+
+    lines.forEach((line, index) => {
+      ctx.fillText(line, startX, startY + (index * 40));
+    });
+  }
+
+  onValue(ref(db, '/gps'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      drawText({
+        homeLat: 43.297331,
+        homeLng: 17.846777,
+        currentLat: data.sirina || 0,
+        currentLng: data.duzina || 0,
+        altitude: data.nadmorskaVisina || 0,
+        distance: data.udaljenost || 0
+      });
+    }
+  });
+
+  const messages = [
+    "Kad dedo kaže ‘Idem do prodavnice’, ali završi na sasvim drugom kraju grada!",
+    "GPS za stare ljude… jer Google Maps nije baš za njih!",
+    "Prati bolje nego što Bajden pamti gdje mu je govornica!",
+    "Čuva starije bolje nego Tajna služba čuva Bajdena!",
+    "Kad život postane zbrkaniji od Bajdenovih govora!",
+    "Bolji GPS nego Bajdenova kampanja!",
+    "Vi se izgubite, mi vas nađemo… Bajden još traži izlaz s bine!",
+    "Jer ponekad ni predsjednik ne zna gdje je… ali mi znamo gdje ste vi!",
+    "Bolje balansira nego Bajden na stepenicama aviona!",
+    "Američki predsjednici hvataju glasove.. A MI SATELITE!",
+    "Bajden namiriše djecu.. a mi ideje :D",
+    "Bajden zna da je u dobrim rukama, zato on onako mirno spava",
+    "Prati vas čak i kad gravitacija odradi svoje!"
+  ];
+
+  let currentIndex = 0;
+  const messageBox = document.getElementById('messageBox');
+
+  function updateMessage() {
+    messageBox.textContent = messages[currentIndex];
+    currentIndex = (currentIndex + 1) % messages.length;
+  }
+
+  updateMessage();
+  setInterval(updateMessage, 5000);
+</script>
+</body>
+</html>
